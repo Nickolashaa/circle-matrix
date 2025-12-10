@@ -150,10 +150,11 @@ class CircleMatrix:
         return cnt
 
     def __str__(self) -> str:
+        tk_results = self.calculate_Tk()
         return (
             "\n"
             + "\n".join(
-                f"Row {i:02d}: " + "  ".join(str(circle) for circle in row)
+                f"Row {i:02d}, Tk {tk_results[i - 1]}: " + "  ".join(str(circle) for circle in row)
                 for i, row in enumerate(self.matrix, 1)
             )
             + "\n"
@@ -166,3 +167,10 @@ class CircleMatrix:
                 flag = False
                 break
         return flag
+    
+    def calculate_Tk(self) -> list[int]:
+        result = [0 for _ in range(self.row_count)]
+        for row_index in range(self.row_count):
+            for col_index in range(self.column_count):
+                result[row_index] += (self.matrix[row_index][col_index].percentile / 100) * 2 ** (col_index * row_index)
+        return [round(c, 4) for c in result]
