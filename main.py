@@ -1,3 +1,4 @@
+from decimal import Decimal, ROUND_HALF_UP
 from random import randint
 
 
@@ -168,9 +169,24 @@ class CircleMatrix:
                 break
         return flag
     
-    def calculate_Tk(self) -> list[int]:
-        result = [0 for _ in range(self.row_count)]
+    def calculate_Tk(self) -> list[Decimal]:
+        results = [Decimal(0) for _ in range(self.row_count)]
         for row_index in range(self.row_count):
             for col_index in range(self.column_count):
-                result[row_index] += (self.matrix[row_index][col_index].percentile / 100) * 2 ** (col_index * row_index)
-        return [round(c, 4) for c in result]
+                percentile_decimal = Decimal(self.matrix[row_index][col_index].percentile) / Decimal(100)
+                exponent = col_index * row_index
+                power_value = Decimal(2) ** exponent
+                results[row_index] += percentile_decimal * power_value
+
+        rounded_results = []
+        for r in results:
+            str_r = str(r)
+            if '.' in str_r:
+                integer_part, decimal_part = str_r.split('.')
+                if len(decimal_part) > 4:
+                    decimal_part = decimal_part[:4]
+                rounded_results.append(Decimal(f"{integer_part}.{decimal_part}"))
+            else:
+                rounded_results.append(r)
+
+        return rounded_results
