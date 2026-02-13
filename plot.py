@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from main import CircleMatrix
 
 
-def generate_plot(cm: CircleMatrix, iterations_needed: list[int]) -> None:
+def generate_plot(cm: CircleMatrix, iterations_needed: list[int], file_name: str) -> None:
     count = len(iterations_needed)
     width = max(8, count * 0.5)
     height = max(6, max(iterations_needed) * 0.3)
@@ -37,4 +37,4 @@ def generate_plot(cm: CircleMatrix, iterations_needed: list[int]) -> None:
     )
 
     plt.grid(True)
-    plt.savefig("simulation_plot.png", dpi=300, bbox_inches="tight")
+    plt.savefig(file_name, dpi=300, bbox_inches="tight")

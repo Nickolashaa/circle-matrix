@@ -1,11 +1,14 @@
 from datetime import datetime
-
+import os
 from random import randint
+
 from main import CircleMatrix
 from plot import generate_plot
 
 if __name__ == "__main__":
-    datetime_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    datetime_str = datetime.now().strftime("%Y.%m.%d %H.%M.%S")
+    dir_name = f"launch {datetime_str}"
+    os.makedirs(f"{dir_name}/logs", exist_ok=True)
 
     cm = CircleMatrix(
         row_count=int(input("Введите кол-во строк: ")),
@@ -32,12 +35,12 @@ if __name__ == "__main__":
         print(generated_numbers)
         cnt = cm.simulate_without_gen(generated_numbers)
         iterations_needed.append(cnt)
-        with open(f"{datetime_str}/logs/simulation {i + 1}.txt", "w") as f:
+        with open(f"{dir_name}/logs/simulation {i + 1}.txt", "w") as f:
             f.write("[" + ", ".join(list(map(str, generated_numbers))) + "]" + str(cm))
 
     print(iterations_needed)
     generate_plot(
-        cm=cm, iterations_needed=iterations_needed, file_name=f"{datetime_str}/plot.png"
+        cm=cm, iterations_needed=iterations_needed, file_name=f"{dir_name}/plot.png"
     )
     print("РАБОТА ЗАВЕРШЕНА")
     input("Для выхода нажмите любую кнопку... ")
