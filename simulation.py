@@ -2,7 +2,7 @@ from datetime import datetime
 import os
 from random import randint
 
-from main import CircleMatrix
+from core import CircleMatrix
 from plot import generate_plot
 
 if __name__ == "__main__":

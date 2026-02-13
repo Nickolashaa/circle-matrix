@@ -1,9 +1,11 @@
 import matplotlib.pyplot as plt
 
-from main import CircleMatrix
+from core import CircleMatrix
 
 
-def generate_plot(cm: CircleMatrix, iterations_needed: list[int], file_name: str) -> None:
+def generate_plot(
+    cm: CircleMatrix, iterations_needed: list[int], file_name: str
+) -> None:
     count = len(iterations_needed)
     width = max(8, count * 0.5)
     height = max(6, max(iterations_needed) * 0.3)
