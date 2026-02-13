@@ -4,12 +4,17 @@ from main import CircleMatrix
 
 
 def generate_plot(cm: CircleMatrix, iterations_needed: list[int]) -> None:
-    count = len(iterations_needed) 
+    count = len(iterations_needed)
     width = max(8, count * 0.5)
     height = max(6, max(iterations_needed) * 0.3)
     plt.figure(figsize=(width, height))
 
-    plt.plot(range(1, len(iterations_needed) + 1), iterations_needed, marker="o", linestyle="-")
+    plt.plot(
+        range(1, len(iterations_needed) + 1),
+        iterations_needed,
+        marker="o",
+        linestyle="-",
+    )
     plt.xlabel("Номер симуляции")
     plt.ylabel("Количество итераций до цели")
     plt.title("Симуляции CircleMatrix")
@@ -22,11 +27,13 @@ def generate_plot(cm: CircleMatrix, iterations_needed: list[int]) -> None:
     plt.yticks(range(min_y, max_y + 1, step_y))
 
     plt.text(
-        0.5, 0.95,
+        0.5,
+        0.95,
         f"rows={cm.row_count}, max_random_value={cm.max_random_value}",
-        ha="center", va="center",
+        ha="center",
+        va="center",
         transform=plt.gca().transAxes,
-        bbox=dict(facecolor="white", alpha=0.6, edgecolor="gray")
+        bbox=dict(facecolor="white", alpha=0.6, edgecolor="gray"),
     )
 
     plt.grid(True)

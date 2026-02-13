@@ -1,4 +1,4 @@
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal
 from random import randint
 
 
@@ -57,7 +57,7 @@ class CircleMatrix:
             generated_number = randint(1, self.max_random_value)
             for circle in row:
                 circle.calculate(generated_number)
-                
+
     def _activate_circles_without_gen(self, numbers: list[int]) -> None:
         for row_index in range(self.row_count):
             generated_number = numbers[row_index]
@@ -121,8 +121,7 @@ class CircleMatrix:
             print(f"Попытка №{cnt}")
             self._deactivate_circles()
             generated_numbers = [
-                randint(1, self.max_random_value)
-                for _ in range(self.row_count)
+                randint(1, self.max_random_value) for _ in range(self.row_count)
             ]
             self._activate_circles_without_gen(generated_numbers)
             col_index = self._get_last_column_circle()
@@ -136,7 +135,7 @@ class CircleMatrix:
                 break
             cnt += 1
         return cnt
-        
+
     def simulate_without_gen(self, numbers: list[int]) -> int:
         cnt = 1
         while True:
@@ -155,7 +154,8 @@ class CircleMatrix:
         return (
             "\n"
             + "\n".join(
-                f"Row {i:02d}, Tk {tk_results[i - 1]}: " + "  ".join(str(circle) for circle in row)
+                f"Row {i:02d}, Tk {tk_results[i - 1]}: "
+                + "  ".join(str(circle) for circle in row)
                 for i, row in enumerate(self.matrix, 1)
             )
             + "\n"
@@ -168,12 +168,14 @@ class CircleMatrix:
                 flag = False
                 break
         return flag
-    
+
     def calculate_Tk(self) -> list[Decimal]:
         results = [Decimal(0) for _ in range(self.row_count)]
         for row_index in range(self.row_count):
             for col_index in range(self.column_count):
-                percentile_decimal = Decimal(self.matrix[row_index][col_index].percentile) / Decimal(100)
+                percentile_decimal = Decimal(
+                    self.matrix[row_index][col_index].percentile
+                ) / Decimal(100)
                 exponent = col_index * row_index
                 power_value = Decimal(2) ** exponent
                 results[row_index] += percentile_decimal * power_value
@@ -181,8 +183,8 @@ class CircleMatrix:
         rounded_results = []
         for r in results:
             str_r = str(r)
-            if '.' in str_r:
-                integer_part, decimal_part = str_r.split('.')
+            if "." in str_r:
+                integer_part, decimal_part = str_r.split(".")
                 if len(decimal_part) > 4:
                     decimal_part = decimal_part[:4]
                 rounded_results.append(Decimal(f"{integer_part}.{decimal_part}"))
