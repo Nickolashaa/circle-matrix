@@ -1,5 +1,4 @@
 from decimal import Decimal
-from random import randint
 
 
 def is_prime(num: int) -> bool:
@@ -118,7 +117,7 @@ class CircleMatrix:
         if self.max_random_value is None:
             raise ValueError("Необходимо задать максимальное значение")
         circle_capacity = 2
-        while circle_capacity < self.max_random_value / 8:
+        while circle_capacity * self.column_count < self.max_random_value:
             circle_capacity *= 2
 
         count = 1
@@ -132,6 +131,7 @@ class CircleMatrix:
                 row.append(Circle(numbers=numbers_to_circle))
             self.matrix.append(row)
             circle_capacity *= 2
+            count = 1
 
     def simulate(self, numbers: list[int]) -> int:
         cnt = 1
