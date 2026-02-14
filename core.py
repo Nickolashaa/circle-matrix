@@ -2,6 +2,30 @@ from decimal import Decimal
 from random import randint
 
 
+def is_prime(num: int) -> bool:
+    for i in range(2, int(num ** 0.5) + 1):
+        if num % i == 0:
+            return False
+    return True
+
+
+def get_tree_dimensions(count: int) -> list[int]:
+    result = [2]
+    num = 2
+    
+    if count == 1:
+        return result
+
+    while count > 0:
+        count -= 1
+        
+        while True:
+            num += 1
+            if is_prime(num):
+                result.append(num)
+                break
+
+
 class Circle:
     def __init__(self, numbers: list[int], percentile: int = 50) -> None:
         if not (0 <= percentile <= 100):
@@ -52,13 +76,7 @@ class CircleMatrix:
                 circle.memory.append(circle.percentile)
                 circle.result = None
 
-    def _activate_circles(self) -> None:
-        for row in self.matrix:
-            generated_number = randint(1, self.max_random_value)
-            for circle in row:
-                circle.calculate(generated_number)
-
-    def _activate_circles_without_gen(self, numbers: list[int]) -> None:
+    def _activate_circles(self, numbers: list[int]) -> None:
         for row_index in range(self.row_count):
             generated_number = numbers[row_index]
             for circle in self.matrix[row_index]:
@@ -115,33 +133,12 @@ class CircleMatrix:
             self.matrix.append(row)
             circle_capacity *= 2
 
-    def simulate(self) -> int:
+    def simulate(self, numbers: list[int]) -> int:
         cnt = 1
         while True:
             print(f"Попытка №{cnt}")
             self._deactivate_circles()
-            generated_numbers = [
-                randint(1, self.max_random_value) for _ in range(self.row_count)
-            ]
-            self._activate_circles_without_gen(generated_numbers)
-            col_index = self._get_last_column_circle()
-            self._update_percentile(col_index)
-            flag = True
-            for i in range(self.column_count):
-                if self.matrix[-1][i].result != self.expected_result:
-                    flag = False
-                    break
-            if flag is True:
-                break
-            cnt += 1
-        return cnt
-
-    def simulate_without_gen(self, numbers: list[int]) -> int:
-        cnt = 1
-        while True:
-            print(f"Попытка №{cnt}")
-            self._deactivate_circles()
-            self._activate_circles_without_gen(numbers)
+            self._activate_circles(numbers)
             col_index = self._get_last_column_circle()
             self._update_percentile(col_index)
             if self.matrix[-1][col_index].result == self.expected_result:
@@ -160,14 +157,6 @@ class CircleMatrix:
             )
             + "\n"
         )
-
-    def check_result(self) -> bool:
-        flag = True
-        for col_index in range(self.column_count):
-            if self.matrix[-1][col_index].result != self.expected_result:
-                flag = False
-                break
-        return flag
 
     def calculate_Tk(self) -> list[Decimal]:
         results = [Decimal(0) for _ in range(self.row_count)]

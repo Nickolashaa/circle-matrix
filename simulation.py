@@ -33,7 +33,7 @@ if __name__ == "__main__":
             randint(1, cm.max_random_value) for _ in range(cm.row_count)
         ]
         print(generated_numbers)
-        cnt = cm.simulate_without_gen(generated_numbers)
+        cnt = cm.simulate(generated_numbers)
         iterations_needed.append(cnt)
         with open(f"{dir_name}/logs/simulation {i + 1}.txt", "w") as f:
             f.write("[" + ", ".join(list(map(str, generated_numbers))) + "]" + str(cm))
