@@ -57,7 +57,9 @@ if __name__ == "__main__":
             iterations_needed.append(cnt)
 
             with open(
-                f"{dir_name}/{dimension}ичное/logs/simulation {i + 1}.txt", "w"
+                file=f"{dir_name}/{dimension}ичное/logs/simulation {i + 1}.txt",
+                mode="w",
+                encoding="utf-8",
             ) as f:
                 f.write(
                     "Сгенерированные числа: ["
