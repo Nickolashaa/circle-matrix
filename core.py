@@ -61,7 +61,7 @@ class CircleMatrix:
         self.row_count = row_count
         self.column_count = dimension ** (row_count - 1)
         self.matrix: list[list[Circle]] = []
-        self.max_random_value: int | None = None
+        self.max_random_value: int = 0
         self.expected_result = expected_result
         self.dimension = dimension
         self.percentile_step = percentile_step
@@ -128,7 +128,7 @@ class CircleMatrix:
                 )
 
     def build(self) -> None:
-        if self.max_random_value is None:
+        if self.max_random_value == 0:
             raise ValueError("Необходимо задать максимальное значение")
         circle_capacity = self.dimension
         while circle_capacity * self.column_count < self.max_random_value:
@@ -138,7 +138,7 @@ class CircleMatrix:
         for _ in range(self.row_count):
             row: list[Circle] = []
             for _ in range(self.column_count):
-                numbers_to_circle = []
+                numbers_to_circle: list[int] = []
                 while len(numbers_to_circle) < circle_capacity:
                     numbers_to_circle.append(count)
                     count = count + 1 if count < self.max_random_value else 1
