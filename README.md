@@ -12,5 +12,4 @@ uv sync
 python .\simulation.py
 ```
 ## Результат
-Логи дерева хранятся в logs
-График симуляций находится в simulation_plot.png
+Находится в папке launch дата время
