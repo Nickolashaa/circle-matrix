@@ -2,7 +2,7 @@ from decimal import Decimal
 
 
 def is_prime(num: int) -> bool:
-    for i in range(2, int(num ** 0.5) + 1):
+    for i in range(2, int(num**0.5) + 1):
         if num % i == 0:
             return False
     return True
@@ -11,22 +11,21 @@ def is_prime(num: int) -> bool:
 def get_tree_dimensions(count: int) -> list[int]:
     result = [2]
     num = 2
-    
+
     if count == 1:
         return result
 
-    while count > 0:
-        count -= 1
-        
+    while len(result) != count:
         while True:
             num += 1
             if is_prime(num):
                 result.append(num)
                 break
+    return result
 
 
 class Circle:
-    def __init__(self, numbers: list[int], percentile: int = 50) -> None:
+    def __init__(self, numbers: list[int], percentile: int) -> None:
         if not (0 <= percentile <= 100):
             raise ValueError("Персентиль должен быть от 0 до 100")
         self.numbers = numbers
@@ -53,21 +52,32 @@ class Circle:
 
 class CircleMatrix:
     def __init__(
-        self, row_count: int, expected_result: bool, percentile_step: int = 10
+        self,
+        row_count: int,
+        expected_result: bool,
+        dimension: int,
+        percentile_step: int = 10,
     ) -> None:
         self.row_count = row_count
-        self.column_count = 2 ** (row_count - 1)
+        self.column_count = dimension ** (row_count - 1)
         self.matrix: list[list[Circle]] = []
         self.max_random_value: int | None = None
         self.expected_result = expected_result
+        self.dimension = dimension
         self.percentile_step = percentile_step
+        self.percentile_default = 50
 
     def set_max_random_value(self, value: int) -> None:
-        if value < self.column_count * 2 or value % self.column_count != 0:
+        if value < self.column_count * self.dimension or value % self.column_count != 0:
             raise ValueError(
-                "Максимальное значение должно быть не меньше и кратно числу столбцов * 2"
+                f"Максимальное значение должно быть не меньше и кратно числу столбцов * {self.dimension}"
             )
         self.max_random_value = value
+
+    def reset_percentiles(self) -> None:
+        for row in self.matrix:
+            for circle in row:
+                circle.percentile = self.percentile_default
 
     def _deactivate_circles(self) -> None:
         for row in self.matrix:
@@ -100,14 +110,18 @@ class CircleMatrix:
         last_circle = self.matrix[-1][column_index_to_change]
 
         if self.expected_result and last_circle.result is False:
-            print(f"Уменьшение персентиля на {self.percentile_step}")
+            print(
+                f"Уменьшение персентиля в {column_index_to_change + 1} колонке на {self.percentile_step}"
+            )
             for row in self.matrix:
                 row[column_index_to_change].percentile = max(
                     0, row[column_index_to_change].percentile - self.percentile_step
                 )
 
         elif not self.expected_result and last_circle.result is True:
-            print(f"Увеличение персентиля на {self.percentile_step}")
+            print(
+                f"Увеличение персентиля в {column_index_to_change + 1} колонке на {self.percentile_step}"
+            )
             for row in self.matrix:
                 row[column_index_to_change].percentile = min(
                     100, row[column_index_to_change].percentile + self.percentile_step
@@ -116,9 +130,9 @@ class CircleMatrix:
     def build(self) -> None:
         if self.max_random_value is None:
             raise ValueError("Необходимо задать максимальное значение")
-        circle_capacity = 2
+        circle_capacity = self.dimension
         while circle_capacity * self.column_count < self.max_random_value:
-            circle_capacity *= 2
+            circle_capacity *= self.dimension
 
         count = 1
         for _ in range(self.row_count):
@@ -128,15 +142,19 @@ class CircleMatrix:
                 while len(numbers_to_circle) < circle_capacity:
                     numbers_to_circle.append(count)
                     count = count + 1 if count < self.max_random_value else 1
-                row.append(Circle(numbers=numbers_to_circle))
+                row.append(
+                    Circle(
+                        numbers=numbers_to_circle, percentile=self.percentile_default
+                    )
+                )
             self.matrix.append(row)
-            circle_capacity *= 2
+            circle_capacity *= self.dimension
             count = 1
 
     def simulate(self, numbers: list[int]) -> int:
         cnt = 1
         while True:
-            print(f"Попытка №{cnt}")
+            print(f"Попытка №{cnt}", end=": ")
             self._deactivate_circles()
             self._activate_circles(numbers)
             col_index = self._get_last_column_circle()
@@ -144,6 +162,7 @@ class CircleMatrix:
             if self.matrix[-1][col_index].result == self.expected_result:
                 break
             cnt += 1
+        print("Матрица стабилизирована")
         return cnt
 
     def __str__(self) -> str:
