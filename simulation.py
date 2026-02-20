@@ -68,7 +68,7 @@ if __name__ == "__main__":
                     + str(cm)
                 )
 
-            # cm.reset_percentiles()
+            cm.reset_percentiles()
 
         generate_plot(
             cm=cm,
