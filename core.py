@@ -25,13 +25,14 @@ def get_tree_dimensions(count: int) -> list[int]:
 
 
 class Circle:
-    def __init__(self, numbers: list[int], percentile: int) -> None:
+    def __init__(self, numbers: list[int], percentile: int, npp: int) -> None:
         if not (0 <= percentile <= 100):
             raise ValueError("Персентиль должен быть от 0 до 100")
         self.numbers = numbers
         self.percentile = percentile
         self.result: bool | None = None
         self.memory: list[int] = []
+        self.npp = npp
 
     def calculate(self, generated_number: int) -> None:
         if generated_number not in self.numbers:
@@ -64,6 +65,11 @@ class CircleMatrix:
         self.max_random_value: int = 0
         self.expected_result = expected_result
         self.dimension = dimension
+        self.variants = [0]
+        if self.dimension > 2:
+            while len(self.variants) != self.dimension:
+                self.variants.append(max(self.variants) + 1)
+                self.variants.append(min(self.variants) - 1)
         self.percentile_step = percentile_step
         self.percentile_default = 50
 
@@ -92,19 +98,36 @@ class CircleMatrix:
                 circle.calculate(generated_number)
 
     def _get_last_column_circle(self) -> int:
-        col_start, col_end = 0, self.column_count
-        column_index_to_change = 0
-        for row in self.matrix:
-            for j, circle in enumerate(row[col_start:col_end]):
-                if circle.result is not None:
-                    column_index_to_change = col_start + j
-                    mid = (col_start + col_end) // 2
-                    if circle.result:
-                        col_start = mid
-                    else:
-                        col_end = mid
-                    break
-        return column_index_to_change
+        if self.dimension == 2:
+            col_start, col_end = 0, self.column_count
+            column_index_to_change = 0
+            for row in self.matrix:
+                for j, circle in enumerate(row[col_start:col_end]):
+                    if circle.result is not None:
+                        column_index_to_change = col_start + j
+                        mid = (col_start + col_end) // 2
+                        if circle.result:
+                            col_start = mid
+                        else:
+                            col_end = mid
+                        break
+            return column_index_to_change
+        
+        row_cnt = 1
+
+        for i in range(len(self.matrix[0])):
+            if self.matrix[0][i].result is not None:
+                main_index = i
+                break
+        
+        while row_cnt < self.row_count:
+            for variant in self.variants:
+                if 0 <= main_index + variant < self.column_count:
+                    if self.matrix[row_cnt][main_index + variant].result is not None:
+                        main_index += variant
+                        break
+            row_cnt += 1
+        
 
     def _update_percentile(self, column_index_to_change: int):
         last_circle = self.matrix[-1][column_index_to_change]
@@ -135,16 +158,16 @@ class CircleMatrix:
             circle_capacity *= self.dimension
 
         count = 1
-        for _ in range(self.row_count):
+        for i in range(self.row_count):
             row: list[Circle] = []
-            for _ in range(self.column_count):
+            for j in range(self.column_count):
                 numbers_to_circle: list[int] = []
                 while len(numbers_to_circle) < circle_capacity:
                     numbers_to_circle.append(count)
                     count = count + 1 if count < self.max_random_value else 1
                 row.append(
                     Circle(
-                        numbers=numbers_to_circle, percentile=self.percentile_default
+                        numbers=numbers_to_circle, percentile=self.percentile_default, npp=j,
                     )
                 )
             self.matrix.append(row)
@@ -158,9 +181,9 @@ class CircleMatrix:
             self._deactivate_circles()
             self._activate_circles(numbers)
             col_index = self._get_last_column_circle()
-            self._update_percentile(col_index)
             if self.matrix[-1][col_index].result == self.expected_result:
                 break
+            self._update_percentile(col_index)
             cnt += 1
         print("Матрица стабилизирована")
         return cnt
